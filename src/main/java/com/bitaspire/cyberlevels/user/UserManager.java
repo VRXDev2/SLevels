@@ -17,6 +17,7 @@ import java.util.UUID;
  *
  * @param <N> the numeric type used for experience points and calculations
  */
+@SuppressWarnings("unused")
 public interface UserManager<N extends Number> {
 
     /**

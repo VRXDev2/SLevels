@@ -26,17 +26,17 @@ public class HookManager {
             main.logger("&7Loaded &ePlaceholderAPI&7 plugin hook in &a" + (System.currentTimeMillis() - l) + "ms&7.");
         }
 
-        if (main.isEnabled("RivalHarvesterHoes")) {
-            final long l = System.currentTimeMillis();
-            hooks.add(new RivalHoesHook(main, this));
-            main.logger("&7Loaded &eRivalHarvesterHoes&7 plugin hook in &a" + (System.currentTimeMillis() - l) + "ms&7.");
-        }
-
-        if (main.isEnabled("RivalPickaxes")) {
-            final long l = System.currentTimeMillis();
-            hooks.add(new RivalPickHook(main, this));
-            main.logger("&7Loaded &eRivalPickaxes&7 plugin hook in &a" + (System.currentTimeMillis() - l) + "ms&7.");
-        }
+//        if (main.isEnabled("RivalHarvesterHoes")) {
+//            final long l = System.currentTimeMillis();
+//            hooks.add(new RivalHoesHook(main, this));
+//            main.logger("&7Loaded &eRivalHarvesterHoes&7 plugin hook in &a" + (System.currentTimeMillis() - l) + "ms&7.");
+//        }
+//
+//        if (main.isEnabled("RivalPickaxes")) {
+//            final long l = System.currentTimeMillis();
+//            hooks.add(new RivalPickHook(main, this));
+//            main.logger("&7Loaded &eRivalPickaxes&7 plugin hook in &a" + (System.currentTimeMillis() - l) + "ms&7.");
+//        }
 
         int c = hooks.size();
         main.logger("&7Loaded &e" + c + "&7 plugin hook" +

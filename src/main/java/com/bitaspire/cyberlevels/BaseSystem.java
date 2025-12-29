@@ -379,6 +379,8 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
         @Getter
         long level;
 
+        public int prestige = 0;
+
         T exp, lastAmount;
         long lastTime = 0L;
 
@@ -652,6 +654,17 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
                     ", progress=" + getPercent() + "%" +
                     '}';
         }
+
+
+        @Override
+        public int getPrestige() {
+            return this.prestige;
+        }
+
+        @Override
+        public void setPrestige(int prestige) {
+            this.prestige = prestige;
+        }
     }
 
     @Getter
@@ -672,6 +685,7 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
         public boolean isOnline() {
             return true;
         }
+
     }
 
     @Getter

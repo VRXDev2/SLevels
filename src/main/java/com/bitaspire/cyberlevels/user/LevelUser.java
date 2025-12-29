@@ -186,4 +186,9 @@ public interface LevelUser<N extends Number> extends Comparable<LevelUser<N>> {
      * @return the experience multiplier
      */
     double getMultiplier();
+
+
+    // Custom: Prestige
+    int getPrestige();
+    void setPrestige(int prestige);
 }

@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -251,7 +251,7 @@ public class EarnExp {
                     PotionMeta meta = (PotionMeta) stack.getItemMeta();
                     if (meta == null) continue;
 
-                    prePotion[i] = meta.getBasePotionData().getType();
+                    prePotion[i] = meta.getBasePotionType();
                 }
 
                 (new BukkitRunnable() {
@@ -268,7 +268,7 @@ public class EarnExp {
 
                             String data = "";
 
-                            PotionType type = meta.getBasePotionData().getType();
+                            PotionType type = meta.getBasePotionType();
                             if (prePotion[i] == null || type != prePotion[i])
                                 data = type.toString();
 

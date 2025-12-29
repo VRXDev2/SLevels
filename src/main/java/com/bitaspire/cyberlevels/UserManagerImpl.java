@@ -7,7 +7,7 @@ import com.bitaspire.cyberlevels.user.Database;
 import com.bitaspire.cyberlevels.user.LevelUser;
 import com.bitaspire.cyberlevels.user.UserManager;
 import lombok.Getter;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;

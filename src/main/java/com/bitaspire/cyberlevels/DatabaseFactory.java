@@ -15,6 +15,7 @@ import java.util.*;
 @UtilityClass
 class DatabaseFactory {
 
+    @SuppressWarnings({"SqlNoDataSourceInspection", "CallToPrintStackTrace", "SqlSourceToSinkFlow"})
     abstract static class DatabaseImpl<N extends Number> implements Database<N> {
 
         final CyberLevels main;
@@ -489,6 +490,7 @@ class DatabaseFactory {
 
     // --------------- MySQL / MariaDB --------------- //
 
+    @SuppressWarnings({"SqlNoDataSourceInspection", "SqlSourceToSinkFlow"})
     static class MySQL<N extends Number> extends DatabaseImpl<N> {
 
         final String ip, database, username, password, table;
@@ -647,6 +649,7 @@ class DatabaseFactory {
 
     // --------------- SQLite --------------- //
 
+    @SuppressWarnings({"SqlNoDataSourceInspection", "SqlSourceToSinkFlow"})
     static class SQLite<N extends Number> extends DatabaseImpl<N> {
 
         private final String filePath, table;
@@ -783,6 +786,7 @@ class DatabaseFactory {
 
     // --------------- PostgreSQL --------------- //
 
+    @SuppressWarnings({"SqlNoDataSourceInspection", "SqlSourceToSinkFlow"})
     static class PostgreSQL<N extends Number> extends DatabaseImpl<N> {
 
         final String ip, database, username, password, table;

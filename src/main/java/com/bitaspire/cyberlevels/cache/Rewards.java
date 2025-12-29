@@ -6,7 +6,7 @@ import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.croabeast.beanslib.message.MessageSender;
 import me.croabeast.file.Configurable;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
