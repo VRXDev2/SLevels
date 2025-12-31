@@ -1,10 +1,10 @@
-name: CyberLevels
+name: SLevels
 version: '${version}'
 main: com.bitaspire.cyberlevels.CyberLevels
 api-version: 1.13
 prefix: CLV
-softdepend: [ PlaceholderAPI, Vault, CyberWorldReset, RivalHarvesterHoes, RivalPickaxes ]
-authors: [ Kihsomray, CroaBeast ]
+softdepend: [ PlaceholderAPI, Vault, CyberWorldReset ]
+authors: [ VRXDev, Kihsomray, CroaBeast ]
 description: A leveling system plugin
 website: bitaspire.com
 folia-supported: true
@@ -12,6 +12,8 @@ folia-supported: true
 commands:
   clv:
     aliases:
+      - slevels
+      - slv
       - cyberlevels
       - cyberlevel
       - cyberlvl
@@ -19,6 +21,7 @@ commands:
       - level
       - lvl
       - lvls
+  prestige: {}
 
 libraries:
   - ch.obermuhlner:big-math:2.3.2

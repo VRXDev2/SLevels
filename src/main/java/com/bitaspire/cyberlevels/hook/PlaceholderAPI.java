@@ -23,7 +23,7 @@ final class PlaceholderAPI implements Hook {
 
             @Override
             public @NotNull String getIdentifier() {
-                return "clv";
+                return "slv";
             }
 
             @Override
@@ -57,20 +57,13 @@ final class PlaceholderAPI implements Hook {
                 String value = user == null ? keys.getLoadingName() : keys.getNoPlayerName();
 
                 if (user != null) {
-                    switch (type.toLowerCase()) {
-                        case "name":
-                            value = user.getName();
-                            break;
-                        case "displayname":
-                            value = user.getPlayer().getDisplayName();
-                            break;
-                        case "level":
-                            value = user.getLevel() + "";
-                            break;
-                        case "exp":
-                            value = system.formatNumber(user.getExp());
-                            break;
-                    }
+                    value = switch (type.toLowerCase()) {
+                        case "name" -> user.getName();
+                        case "displayname" -> user.getPlayer().getDisplayName();
+                        case "level" -> user.getLevel() + "";
+                        case "exp" -> system.formatNumber(user.getExp());
+                        default -> value;
+                    };
                 }
 
                 return main.core().textSettings()
@@ -84,7 +77,7 @@ final class PlaceholderAPI implements Hook {
                 LevelSystem<?> system = main.levelSystem();
 
                 switch (identifier.toLowerCase()) {
-                    case "level_maximum": return system.getMaxLevel() + "";
+//                    case "level_maximum": return system.getMaxLevel() + "";
                     case "exp_minimum": return system.getStartExp() + "";
                     case "level_minimum":  return system.getStartLevel() + "";
                 }
@@ -101,30 +94,18 @@ final class PlaceholderAPI implements Hook {
                 LevelUser<?> user = main.userManager().getUser((Player) player);
                 if (user == null) return "0";
 
-                switch (identifier.toLowerCase()) {
-                    case "player_level":
-                        return String.valueOf(user.getLevel());
+                return switch (identifier.toLowerCase()) {
+                    case "player_level" -> String.valueOf(user.getLevel());
+                    case "player_prestige" -> String.valueOf(user.getPrestige());
+                    case "player_level_next" -> (Math.min(user.getLevel() + 1, system.getMaxLevel(user))) + "";
+                    case "player_exp" -> system.formatNumber(user.getExp());
+                    case "player_exp_required" -> system.formatNumber(user.getRequiredExp());
+                    case "player_exp_remaining" -> system.formatNumber(user.getRemainingExp());
+                    case "player_exp_progress_bar" -> main.core().textSettings().colorize(user.getProgressBar());
+                    case "player_exp_percent" -> user.getPercent();
+                    default -> null;
+                };
 
-                    case "player_level_next":
-                        return (Math.min(user.getLevel() + 1, system.getMaxLevel())) + "";
-
-                    case "player_exp":
-                        return system.formatNumber(user.getExp());
-
-                    case "player_exp_required":
-                        return system.formatNumber(user.getRequiredExp());
-
-                    case "player_exp_remaining":
-                        return system.formatNumber(user.getRemainingExp());
-
-                    case "player_exp_progress_bar":
-                        return main.core().textSettings().colorize(user.getProgressBar());
-
-                    case "player_exp_percent":
-                        return user.getPercent();
-                }
-
-                return null;
             }
         };
     }

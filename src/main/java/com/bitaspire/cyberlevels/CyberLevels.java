@@ -3,6 +3,7 @@ package com.bitaspire.cyberlevels;
 import com.bitaspire.cyberlevels.cache.Cache;
 import com.bitaspire.cyberlevels.command.CLVCommand;
 import com.bitaspire.cyberlevels.command.CLVTabComplete;
+import com.bitaspire.cyberlevels.command.PrestigeCommand;
 import com.bitaspire.cyberlevels.hook.HookManager;
 import com.bitaspire.cyberlevels.level.LevelSystem;
 import com.bitaspire.cyberlevels.listener.Listeners;
@@ -18,6 +19,8 @@ import net.zerotoil.dev.cybercore.CyberCore;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.List;
 
 @Accessors(fluent = true)
 @Getter
@@ -46,7 +49,7 @@ public final class CyberLevels extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        if (!CyberCore.restrictVersions(8, 22, "CLV", getDescription().getVersion()))
+        if (!CyberCore.restrictVersions(8, 22, "SLevels", getDescription().getVersion()))
             return;
 
         instance = this;
@@ -72,6 +75,11 @@ public final class CyberLevels extends JavaPlugin {
         if (command != null) {
             command.setExecutor(new CLVCommand(this));
             command.setTabCompleter(new CLVTabComplete());
+        }
+        PluginCommand prestigeCommand = this.getCommand("prestige");
+        if (prestigeCommand != null) {
+            prestigeCommand.setExecutor(new PrestigeCommand(this));
+            prestigeCommand.setTabCompleter((sender, command1, label, args) -> List.of());
         }
 
         reloadPlugin();

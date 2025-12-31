@@ -41,11 +41,7 @@ class DatabaseFactory {
             return name;
         }
 
-        abstract PreparedStatement prepareUpsert(Connection c,
-                                                 UUID uuid,
-                                                 long level,
-                                                 String exp,
-                                                 long updatedAt) throws SQLException;
+        abstract PreparedStatement prepareUpsert(Connection c, UUID uuid, long level, int prestige, String exp, long updatedAt) throws SQLException;
 
         abstract PreparedStatement prepareUpsertMeta(Connection c,
                                                      UUID uuid,
@@ -141,7 +137,7 @@ class DatabaseFactory {
             }
 
             Set<String> cols = getExistingColumns(conn);
-            boolean needMigration = !cols.contains("UUID") || !cols.contains("LEVEL") || !cols.contains("EXP");
+            boolean needMigration = !cols.contains("UUID") || !cols.contains("LEVEL") || !cols.contains("PRESTIGES") || !cols.contains("EXP");
 
             if (cols.contains("MAX_LEVEL") ||
                     !cols.contains("UPDATED_AT") ||
@@ -360,15 +356,16 @@ class DatabaseFactory {
             }
 
             String sql = "INSERT INTO " + qTab(getTable()) + " (" +
-                    qCol("UUID") + "," + qCol("LEVEL") + "," + qCol("EXP") + "," + qCol("UPDATED_AT") +
+                    qCol("UUID") + "," + qCol("LEVEL") + "," + qCol("PRESTIGES") + "," + qCol("EXP") + "," + qCol("UPDATED_AT") +
                     ") VALUES (?,?,?,?)";
 
             try (Connection connection = dataSource.getConnection();
                  PreparedStatement st = connection.prepareStatement(sql)) {
                 st.setString(1, user.getUuid().toString());
                 st.setLong(2, Long.parseLong(levelStr));
-                st.setString(3, expStr);
-                st.setLong(4, System.currentTimeMillis());
+                st.setInt(3, user.getPrestige());
+                st.setString(4, expStr);
+                st.setLong(5, System.currentTimeMillis());
                 st.executeUpdate();
 
                 long now = System.currentTimeMillis();
@@ -393,6 +390,7 @@ class DatabaseFactory {
                         connection,
                         uuid,
                         user.getLevel(),
+                        user.getPrestige(),
                         String.valueOf(user.getExp()),
                         now
                 )) {
@@ -437,7 +435,7 @@ class DatabaseFactory {
         public LevelUser<N> getUser(UUID uuid) {
             if (!isConnected() || uuid == null) return null;
 
-            String sql = "SELECT " + qCol("LEVEL") + "," + qCol("EXP") + " FROM " + qTab(getTable()) + " WHERE " + qCol("UUID") + "=?";
+            String sql = "SELECT " + qCol("LEVEL") + "," + qCol("PRESTIGES") + "," + qCol("EXP") + " FROM " + qTab(getTable()) + " WHERE " + qCol("UUID") + "=?";
 
             try (Connection connection = dataSource.getConnection();
                  PreparedStatement st = connection.prepareStatement(sql)) {
@@ -449,6 +447,9 @@ class DatabaseFactory {
                     LevelUser<N> user = system.createUser(uuid);
                     long level = rs.getLong("LEVEL");
                     user.setLevel(level, false);
+
+                    int prestiges = rs.getInt("PRESTIGES");
+                    user.setPrestige(prestiges);
 
                     String expStr = rs.getString("EXP");
                     if (expStr == null) expStr = "0";
@@ -537,10 +538,10 @@ class DatabaseFactory {
         }
 
         @Override
-        PreparedStatement prepareUpsert(Connection c, UUID uuid, long level, String exp, long updatedAt) throws SQLException {
+        PreparedStatement prepareUpsert(Connection c, UUID uuid, long level, int prestige, String exp, long updatedAt) throws SQLException {
             String sql =
                     "INSERT INTO " + qTab(getTable()) + " (" +
-                            qCol("UUID") + "," + qCol("LEVEL") + "," + qCol("EXP") + "," + qCol("UPDATED_AT") + ") " +
+                            qCol("UUID") + "," + qCol("LEVEL") + "," + qCol("PRESTIGES") + "," + qCol("EXP") + "," + qCol("UPDATED_AT") + ") " +
                             "VALUES (?,?,?,?) " +
                             "ON DUPLICATE KEY UPDATE " +
                             qCol("LEVEL") + " = IF(VALUES(" + qCol("UPDATED_AT") + ") >= " + qCol("UPDATED_AT") + ", VALUES(" + qCol("LEVEL") + ")," + qCol("LEVEL") + ")," +
@@ -549,8 +550,9 @@ class DatabaseFactory {
             PreparedStatement ps = c.prepareStatement(sql);
             ps.setString(1, uuid.toString());
             ps.setLong(2, level);
-            ps.setString(3, exp);
-            ps.setLong(4, updatedAt);
+            ps.setInt(3, prestige);
+            ps.setString(4, exp);
+            ps.setLong(5, updatedAt);
             return ps;
         }
 
@@ -623,6 +625,7 @@ class DatabaseFactory {
             String sql = "CREATE TABLE IF NOT EXISTS " + qTab(getTable()) + " (" +
                     qCol("UUID") + " VARCHAR(36) NOT NULL," +
                     qCol("LEVEL") + " BIGINT," +
+                    qCol("PRESTIGES") + " BIGINT," +
                     qCol("EXP") + " TEXT," +
                     qCol("UPDATED_AT") + " BIGINT NOT NULL DEFAULT 0," +
                     "PRIMARY KEY (" + qCol("UUID") + ")) " +
@@ -683,20 +686,45 @@ class DatabaseFactory {
         }
 
         @Override
-        PreparedStatement prepareUpsert(Connection c, UUID uuid, long level, String exp, long updatedAt) throws SQLException {
+        PreparedStatement prepareUpsert(Connection c, UUID uuid, long level, int prestige, String exp, long updatedAt) throws SQLException {
             String sql =
                     "INSERT INTO " + qTab(getTable()) + " (" +
-                            qCol("UUID") + "," + qCol("LEVEL") + "," + qCol("EXP") + "," + qCol("UPDATED_AT") + ") " +
-                            "VALUES (?,?,?,?) " +
+                            qCol("UUID") + "," +
+                            qCol("LEVEL") + "," +
+                            qCol("PRESTIGES") + "," +
+                            qCol("EXP") + "," +
+                            qCol("UPDATED_AT") +
+                            ") VALUES (?,?,?,?,?) " +
                             "ON CONFLICT(" + qCol("UUID") + ") DO UPDATE SET " +
-                            qCol("LEVEL") + " = CASE WHEN excluded." + qCol("UPDATED_AT") + " >= " + qTab(getTable()) + "." + qCol("UPDATED_AT") + " THEN excluded." + qCol("LEVEL") + " ELSE " + qTab(getTable()) + "." + qCol("LEVEL") + " END," +
-                            qCol("EXP") + " = CASE WHEN excluded." + qCol("UPDATED_AT") + " >= " + qTab(getTable()) + "." + qCol("UPDATED_AT") + " THEN excluded." + qCol("EXP") + " ELSE " + qTab(getTable()) + "." + qCol("EXP") + " END," +
-                            qCol("UPDATED_AT") + " = MAX(" + qTab(getTable()) + "." + qCol("UPDATED_AT") + ", excluded." + qCol("UPDATED_AT") + ")";
+
+                            qCol("LEVEL") + " = CASE " +
+                            "WHEN excluded." + qCol("UPDATED_AT") + " >= " + qTab(getTable()) + "." + qCol("UPDATED_AT") +
+                            " THEN excluded." + qCol("LEVEL") +
+                            " ELSE " + qTab(getTable()) + "." + qCol("LEVEL") +
+                            " END," +
+
+                            qCol("PRESTIGES") + " = CASE " +
+                            "WHEN excluded." + qCol("UPDATED_AT") + " >= " + qTab(getTable()) + "." + qCol("UPDATED_AT") +
+                            " THEN excluded." + qCol("PRESTIGES") +
+                            " ELSE " + qTab(getTable()) + "." + qCol("PRESTIGES") +
+                            " END," +
+
+                            qCol("EXP") + " = CASE " +
+                            "WHEN excluded." + qCol("UPDATED_AT") + " >= " + qTab(getTable()) + "." + qCol("UPDATED_AT") +
+                            " THEN excluded." + qCol("EXP") +
+                            " ELSE " + qTab(getTable()) + "." + qCol("EXP") +
+                            " END," +
+
+                            qCol("UPDATED_AT") + " = MAX(" +
+                            qTab(getTable()) + "." + qCol("UPDATED_AT") +
+                            ", excluded." + qCol("UPDATED_AT") +
+                            ")";
             PreparedStatement ps = c.prepareStatement(sql);
             ps.setString(1, uuid.toString());
             ps.setLong(2, level);
-            ps.setString(3, exp);
-            ps.setLong(4, updatedAt);
+            ps.setInt(3, prestige);
+            ps.setString(4, exp);
+            ps.setLong(5, updatedAt);
             return ps;
         }
 
@@ -761,6 +789,7 @@ class DatabaseFactory {
             String sql = "CREATE TABLE IF NOT EXISTS " + qTab(getTable()) + " (" +
                     qCol("UUID") + " TEXT PRIMARY KEY," +
                     qCol("LEVEL") + " INTEGER," +
+                    qCol("PRESTIGES") + " INTEGER NOT NULL DEFAULT 0," +
                     qCol("EXP") + " TEXT," +
                     qCol("UPDATED_AT") + " INTEGER NOT NULL DEFAULT 0" +
                     ")";
@@ -830,7 +859,7 @@ class DatabaseFactory {
         }
 
         @Override
-        PreparedStatement prepareUpsert(Connection c, UUID uuid, long level, String exp, long updatedAt) throws SQLException {
+        PreparedStatement prepareUpsert(Connection c, UUID uuid, long level, int prestige, String exp, long updatedAt) throws SQLException {
             String sql =
                     "INSERT INTO " + qTab(getTable()) + " (" +
                             qCol("UUID") + "," + qCol("LEVEL") + "," + qCol("EXP") + "," + qCol("UPDATED_AT") + ") " +
@@ -943,16 +972,10 @@ class DatabaseFactory {
     static <N extends Number> Database<N> createDatabase(CyberLevels main, BaseSystem<N> system) {
         String type = main.cache().config().database().getType();
 
-        switch (type.toUpperCase(Locale.ENGLISH)) {
-            case "POSTGRES":
-            case "POSTGRESQL":
-                return new PostgreSQL<>(main, system);
-            case "MYSQL":
-            case "MARIADB":
-                return new MySQL<>(main, system);
-            case "SQLITE":
-            default:
-                return new SQLite<>(main, system);
-        }
+        return switch (type.toUpperCase(Locale.ENGLISH)) {
+            case "POSTGRES", "POSTGRESQL" -> new PostgreSQL<>(main, system);
+            case "MYSQL", "MARIADB" -> new MySQL<>(main, system);
+            default -> new SQLite<>(main, system);
+        };
     }
 }

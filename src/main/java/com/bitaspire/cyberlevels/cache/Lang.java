@@ -61,6 +61,8 @@ public class Lang {
     private List<String> setLevel = Collections.singletonList("&aSet {player}'s level to {setLevel}. They are now level {level} with {playerEXP} experience.");
     private List<String> removedLevels = Collections.singletonList("&aRemoved {removedLevels} from {player}'s level(s). They are now level {level} with {playerEXP} experience.");
 
+    private List<String> setPrestige = Collections.singletonList("&aSet {player}'s prestige to {setPrestige}.");
+
     private List<String> playerNotFound = Collections.singletonList("&cThe player {player} is not found in the database!");
     private List<String> notNumber = Collections.singletonList("&cThat is not a number!");
     private List<String> purgePlayer = Collections.singletonList("&cThe player {player} was removed from CLV''s data.");
@@ -78,6 +80,9 @@ public class Lang {
     private List<String> lostExp = Collections.singletonList("[actionbar] &c-{lostEXP} EXP");
     private List<String> gainedLevels = Collections.singletonList("[actionbar] &d+{gainedLevels} Level(s)");
     private List<String> lostLevels = Collections.singletonList("[actionbar] &c-{lostLevels} Level(s)");
+
+    private List<String> gainedPrestige = Collections.singletonList("&aYou have prestiged. New max level: &f{maxLevel}");
+    private List<String> needLevels = Collections.singletonList("&cYou need &7{needed} levels &cto prestige!");
 
     private List<String> topHeader = Collections.singletonList("[C] &8&m―――――――&8<&d&l Top &f&lPlayers &8>&8&m―――――――");
     private List<String> topContent = Collections.singletonList("&f[{position}] &d{player}&7: &7level: &f{level}&7, exp: &f{exp}");
@@ -115,6 +120,8 @@ public class Lang {
             setLevel = Configurable.toStringList(file.getConfiguration(), "messages.set-level", setLevel);
             removedLevels = Configurable.toStringList(file.getConfiguration(), "messages.removed-levels", removedLevels);
 
+            setPrestige = Configurable.toStringList(file.getConfiguration(), "messages.set-prestige", setPrestige);
+
             playerNotFound = Configurable.toStringList(file.getConfiguration(), "messages.player-not-found", playerNotFound);
             notNumber = Configurable.toStringList(file.getConfiguration(), "messages.not-number", notNumber);
             purgePlayer = Configurable.toStringList(file.getConfiguration(), "messages.purge-player", purgePlayer);
@@ -125,6 +132,9 @@ public class Lang {
             lostExp = Configurable.toStringList(file.getConfiguration(), "messages.lost-exp", lostExp);
             gainedLevels = Configurable.toStringList(file.getConfiguration(), "messages.gained-levels", gainedLevels);
             lostLevels = Configurable.toStringList(file.getConfiguration(), "messages.lost-levels", lostLevels);
+
+            gainedPrestige = Configurable.toStringList(file.getConfiguration(), "messages.gained-prestige", gainedPrestige);
+            needLevels = Configurable.toStringList(file.getConfiguration(), "messages.need-levels", needLevels);
 
             topHeader = Configurable.toStringList(file.getConfiguration(), "messages.top-header", topHeader);
             topContent = Configurable.toStringList(file.getConfiguration(), "messages.top-content", topContent);

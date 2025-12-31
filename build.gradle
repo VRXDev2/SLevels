@@ -67,7 +67,7 @@ dependencies {
     compileOnly 'org.apache.commons:commons-lang3:3.18.0'
 }
 
-def targetJavaVersion = 8
+def targetJavaVersion = 21
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion

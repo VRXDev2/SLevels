@@ -20,7 +20,7 @@ final class DoubleLevelSystem extends BaseSystem<Double> {
         super(main);
         setLeaderboardFunction(DoubleLeaderboard::new);
 
-        operator = new Operator<Double>() {
+        operator = new Operator<>() {
             @Override
             public Double zero() {
                 return 0.0;
@@ -63,14 +63,11 @@ final class DoubleLevelSystem extends BaseSystem<Double> {
                 double result = a / b;
                 double factor = Math.pow(10, scale);
 
-                switch (mode) {
-                    case UP:
-                        return Math.ceil(result * factor) / factor;
-                    case DOWN:
-                        return Math.floor(result * factor) / factor;
-                    case HALF_UP: default:
-                        return Math.round(result * factor) / factor;
-                }
+                return switch (mode) {
+                    case UP -> Math.ceil(result * factor) / factor;
+                    case DOWN -> Math.floor(result * factor) / factor;
+                    default -> Math.round(result * factor) / factor;
+                };
             }
 
             @Override

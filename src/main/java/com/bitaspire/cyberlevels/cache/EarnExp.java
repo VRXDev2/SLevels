@@ -238,10 +238,9 @@ public class EarnExp {
                 if (event.isCancelled() || event.getContents().getViewers().isEmpty())
                     return;
 
-                HumanEntity humanEntity = event.getContents().getViewers().get(0);
-                if (!(humanEntity instanceof Player)) return;
+                HumanEntity humanEntity = event.getContents().getViewers().getFirst();
+                if (!(humanEntity instanceof Player player)) return;
 
-                final Player player = (Player) humanEntity;
                 PotionType[] prePotion = new PotionType[3];
 
                 for (int i = 0; i <= 2 ; i++) {
@@ -421,9 +420,8 @@ public class EarnExp {
                     damager = ((TNTPrimed) damager).getSource();
                 }
 
-                if (!(damager instanceof Player)) return;
+                if (!(damager instanceof Player killer)) return;
 
-                Player killer = (Player) damager;
                 Entity victim = event.getEntity();
 
                 sendExp(killer, source, (victim instanceof Player) ? victim.getName() : victim.getType().toString());

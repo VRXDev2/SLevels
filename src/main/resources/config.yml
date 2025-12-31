@@ -11,7 +11,7 @@ config:
     password: 'password'
     table: 'levels'
     ssl: true
-    sqlite-file: "plugins/CyberLevels/data.db"
+    sqlite-file: "plugins/SLevels/data.db"
 
   use-big-decimal-system: false
 

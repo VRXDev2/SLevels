@@ -95,7 +95,7 @@ public class Config {
                 database = "database",
                 username = "username", password = "password",
                 table = "levels", type = "MySQL",
-                sqliteFile = "plugins/CyberLevels/data.db";
+                sqliteFile = "plugins/SLevels/data.db";
 
         Database(ConfigurationSection section) {
             if (section == null) return;

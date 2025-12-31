@@ -148,6 +148,10 @@ final class UserManagerImpl<N extends Number> implements UserManager<N> {
 
             line = reader.readLine();
             if (line == null) return null;
+            user.setPrestige(Integer.parseInt(line.trim()));
+
+            line = reader.readLine();
+            if (line == null) return null;
             user.setExp(line.trim(), false, false, false);
 
             line = reader.readLine();
@@ -170,6 +174,7 @@ final class UserManagerImpl<N extends Number> implements UserManager<N> {
 
         try (BufferedWriter writer = Files.newBufferedWriter(file)) {
             writer.write(user.getLevel() + "\n");
+            writer.write(user.getPrestige() + "\n");
             writer.write(user.getExp() + "\n");
             long claimed = getRewardLevel(user);
             writer.write(claimed + "\n");
@@ -189,6 +194,7 @@ final class UserManagerImpl<N extends Number> implements UserManager<N> {
             LevelUser<N> newUser = system.createUser(uuid);
 
             newUser.setLevel(user.getLevel(), false);
+            newUser.setPrestige(user.getPrestige());
             newUser.setExp(user.getExp() + "", true, false, false);
             setRewardLevel(newUser, getRewardLevel(user));
 
@@ -262,6 +268,7 @@ final class UserManagerImpl<N extends Number> implements UserManager<N> {
         try {
             LevelUser<N> offline = system.createOffline(uuid);
             offline.setLevel(user.getLevel(), false);
+            offline.setPrestige(user.getPrestige());
             offline.setExp(user.getExp(), false, false, false);
 
             setRewardLevel(offline, getRewardLevel(user));

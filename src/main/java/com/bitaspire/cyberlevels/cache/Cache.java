@@ -15,6 +15,7 @@ public class Cache {
     private final Config config;
     private final Lang lang;
     private final Levels levels;
+    private final Prestige prestige;
     private final Rewards rewards;
 
     private AntiAbuse antiAbuse;
@@ -29,6 +30,7 @@ public class Cache {
         config = new Config(main);
         lang = new Lang(main);
         levels = new Levels(main);
+        prestige = new Prestige(main);
         rewards = new Rewards(main);
 
         if (config.autoUpdateConfig())

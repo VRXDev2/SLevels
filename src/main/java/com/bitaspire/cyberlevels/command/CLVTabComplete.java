@@ -13,8 +13,8 @@ import java.util.*;
 
 public class CLVTabComplete implements TabCompleter {
 
-    private static final String PLAYER_PREFIX = "CyberLevels.player.";
-    private static final String ADMIN_PREFIX = "CyberLevels.admin.";
+    private static final String PLAYER_PREFIX = "slevels.player.";
+    private static final String ADMIN_PREFIX = "slevels.admin.";
 
     private static final Map<String, String> COMMAND_PERMISSIONS = new HashMap<>();
 
@@ -35,12 +35,13 @@ public class CLVTabComplete implements TabCompleter {
         COMMAND_PERMISSIONS.put("addLevel", ADMIN_PREFIX + "levels.add");
         COMMAND_PERMISSIONS.put("setLevel", ADMIN_PREFIX + "levels.set");
         COMMAND_PERMISSIONS.put("removeLevel", ADMIN_PREFIX + "levels.remove");
+
+        COMMAND_PERMISSIONS.put("setPrestige", ADMIN_PREFIX + "prestiges.set");
     }
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
-        if (!(sender instanceof Player)) return Collections.emptyList();
-        Player player = (Player) sender;
+        if (!(sender instanceof Player player)) return Collections.emptyList();
 
         if (args.length == 1) {
             List<String> available = new ArrayList<>();
@@ -62,18 +63,17 @@ public class CLVTabComplete implements TabCompleter {
                         return partialMatch(args[1], getPlayerNames());
                     break;
 
-                case "addexp": case "setexp": case "removeexp":
+                case "addexp", "setexp", "removeexp":
                     return partialMatch(args[1], Arrays.asList("<amount>", "5", "100", "250", "1000"));
 
-                case "addlevel": case "setlevel": case "removelevel":
+                case "addlevel", "setlevel", "removelevel", "setprestige":
                     return partialMatch(args[1], Arrays.asList("<amount>", "1", "2", "5"));
             }
         }
 
         if (args.length == 3 &&
-                Arrays.asList("addexp", "setexp", "removeexp", "addlevel", "setlevel", "removelevel")
-                        .contains(args[0].toLowerCase()))
-        {
+                Arrays.asList("addexp", "setexp", "removeexp", "addlevel", "setlevel", "removelevel", "setprestige").contains(args[0].toLowerCase())) {
+
             List<String> suggestions = new ArrayList<>();
             suggestions.add("[<player>]");
             suggestions.addAll(getPlayerNames());

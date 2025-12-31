@@ -16,6 +16,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -31,7 +32,7 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
     final CyberLevels main;
     final Cache cache;
 
-    private final long startLevel, maxLevel;
+    private final long startLevel;
     private final int startExp;
 
     private final Formula<N> formula;
@@ -53,7 +54,6 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
 
         startExp = cache.levels().getStartExp();
         startLevel = cache.levels().getStartLevel();
-        maxLevel = cache.levels().getMaxLevel();
 
         formula = createFormula(cache.levels().getFormula());
         cache.levels().getCustomFormulas().forEach((k, v) -> formulas.put(k, createFormula(v)));
@@ -127,13 +127,14 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
     public String replacePlaceholders(String string, UUID uuid, boolean safeForFormula) {
         LevelUser<N> data = userManager.getUser(uuid);
 
-        String[] keys = {"{level}", "{playerEXP}", "{nextLevel}",
+        String[] keys = {"{level}", "{prestige}", "{playerEXP}", "{nextLevel}",
                 "{maxLevel}", "{minLevel}", "{minEXP}"};
         String[] values = {
                 String.valueOf(data.getLevel()),
+                String.valueOf(data.getPrestige()),
                 roundString(data.getExp()),
                 String.valueOf(data.getLevel() + 1),
-                String.valueOf(maxLevel),
+                String.valueOf(getMaxLevel(data)),
                 String.valueOf(startLevel),
                 String.valueOf(startExp)
         };
@@ -156,6 +157,11 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
         }
 
         return Beans.formatPlaceholders(data.isOnline() ? data.getPlayer() : null, string);
+    }
+
+    @Override
+    public int getMaxLevel(@UnknownNullability LevelUser<?> data) {
+        return (data.getPrestige() + 1) * cache.prestige().levelsPerPrestige;
     }
 
     @NotNull
@@ -185,7 +191,7 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
 
     @NotNull
     public String getPercent(N exp, N requiredExp) {
-        if (getOperator().compare(requiredExp, getOperator().zero()) == 0) return "0";
+        if (getOperator().compare(requiredExp, getOperator().zero()) == 0) return "100";
         if (getOperator().compare(exp, requiredExp) >= 0) return "100";
 
         N scaled = getOperator().multiply(exp, getOperator().fromDouble(100));
@@ -244,8 +250,7 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
             StringBuilder pattern = new StringBuilder("#");
             if (decimals > 0) {
                 pattern.append(".");
-                for (int i = 0; i < decimals; i++)
-                    pattern.append("#");
+                pattern.append("#".repeat(decimals));
             }
 
             decimalFormat = new DecimalFormat(pattern.toString());
@@ -342,6 +347,7 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
 
         abstract Entry<T> toEntry(LevelUser<T> user);
 
+        @SuppressWarnings("InnerClassMayBeStatic")
         @Getter
         abstract class Entry<X extends Number> implements Comparable<Entry<X>> {
 
@@ -442,12 +448,12 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
         }
 
         public void addLevel(long amount) {
-            long target = Math.min(level + Math.max(amount, 0), getMaxLevel());
+            long target = Math.min(level + Math.max(amount, 0), getMaxLevel(this));
             updateLevel(target, true, true);
         }
 
         public void setLevel(long amount, boolean sendMessage) {
-            long min = getStartLevel(); long max = getMaxLevel();
+            long min = getStartLevel(); long max = getMaxLevel(this);
             long target = Math.max(Math.min(amount, max), min);
 
             if (amount < min || amount >= max) exp = operator.zero();
@@ -462,11 +468,11 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
         private void changeExp(T amount, T difference, boolean sendMessage, boolean doMultiplier, boolean checkLeaderboard) {
             if (operator.compare(amount, operator.zero()) == 0) return;
 
-            if (operator.compare(amount, operator.zero()) > 0 && level >= getMaxLevel())
+            if (operator.compare(amount, operator.zero()) > 0 && level >= getMaxLevel(this))
                 return;
 
             if (doMultiplier && operator.compare(amount, operator.zero()) > 0 &&
-                    hasParentPerm("CyberLevels.player.multiplier.", false))
+                    hasParentPerm("slevels.player.multiplier.", false))
                 amount = operator.multiply(amount, operator.fromDouble(getMultiplier()));
 
             final T totalAmount = amount;
@@ -474,7 +480,7 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
 
             if (operator.compare(amount, operator.zero()) > 0) {
                 while (operator.compare(operator.add(exp, amount), rawRequiredExp()) >= 0) {
-                    if (level == getMaxLevel()) {
+                    if (level == getMaxLevel(this)) {
                         exp = operator.zero();
                         return;
                     }
@@ -533,7 +539,7 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
             lastAmount = displayTotal;
             lastTime = System.currentTimeMillis();
 
-            level = Math.max(getStartLevel(), Math.min(level, getMaxLevel()));
+            level = Math.max(getStartLevel(), Math.min(level, getMaxLevel(this)));
             if (operator.compare(exp, operator.zero()) < 0) exp = operator.zero();
 
             if (checkLeaderboard) system.updateLeaderboard();
@@ -627,7 +633,7 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
                 if (!perm.getValue()) continue;
 
                 String s = perm.getPermission().toLowerCase(Locale.ENGLISH);
-                if (!s.startsWith("cyberlevels.player.multiplier."))
+                if (!s.startsWith("slevels.player.multiplier."))
                     continue;
 
                 try {

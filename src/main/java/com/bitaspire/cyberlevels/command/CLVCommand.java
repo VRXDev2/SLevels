@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 public class CLVCommand implements CommandExecutor {
@@ -134,14 +135,17 @@ public class CLVCommand implements CommandExecutor {
 
                 case "removelevel":
                     return handleLevel(player, user, value, "level.remove", LevelAction.REMOVE);
+
+                case "setprestige":
+                    return handlePrestige(player, user, value, "prestige.set", PrestigeAction.SET);
             }
         }
 
         if (player != null) {
-            if (player.hasPermission("CyberLevels.admin.help"))
+            if (player.hasPermission("slevels.admin.help"))
                 return main.cache().lang().sendMessage(player, Lang::getHelpAdmin);
 
-            if (player.hasPermission("CyberLevels.player.help"))
+            if (player.hasPermission("slevels.player.help"))
                 return main.cache().lang().sendMessage(player, Lang::getHelpPlayer);
         }
 
@@ -154,9 +158,10 @@ public class CLVCommand implements CommandExecutor {
 
         return main.cache().lang().sendMessage(
                 player, Lang::getLevelInfo,
-                new String[] {"player", "level", "maxLevel", "playerEXP", "requiredEXP", "percent", "progressBar"},
+                new String[] {"player", "level", "prestige", "maxLevel", "playerEXP", "requiredEXP", "percent", "progressBar"},
                 user.getName(), user.getLevel(),
-                main.cache().levels().getMaxLevel(),
+                user.getPrestige(),
+                system.getMaxLevel(user),
                 system.formatNumber(user.getExp()),
                 system.formatNumber(user.getRequiredExp()),
                 user.getPercent(),
@@ -169,10 +174,11 @@ public class CLVCommand implements CommandExecutor {
 
         return main.cache().lang().sendMessage(
                 viewer, Lang::getLevelInfo,
-                new String[]{"player","level","maxLevel","playerEXP","requiredEXP","percent","progressBar"},
+                new String[]{"player","level", "prestige","maxLevel","playerEXP","requiredEXP","percent","progressBar"},
                 target.getName(),
                 target.getLevel(),
-                main.cache().levels().getMaxLevel(),
+                target.getPrestige(),
+                system.getMaxLevel(target),
                 system.formatNumber(target.getExp()),
                 system.formatNumber(target.getRequiredExp()),
                 target.getPercent(),
@@ -232,8 +238,26 @@ public class CLVCommand implements CommandExecutor {
         );
     }
 
+    @SuppressWarnings("SameParameterValue")
+    private boolean handlePrestige(Player player, LevelUser<?> user, String arg, String perm, PrestigeAction action) {
+        if (isRestricted(player, perm) || notLong(player, arg)) return true;
+        int value = Math.abs(Integer.parseInt(arg));
+
+        if (Objects.requireNonNull(action) == PrestigeAction.SET) {
+            user.setPrestige(value);
+        }
+
+        LevelSystem<?> system = main.levelSystem();
+
+        return main.cache().lang().sendMessage(
+                player, action.getMessage(),
+                new String[] {"player", action.getPlaceholder(), "level", "playerEXP", "prestige"},
+                user.getName(), arg, user.getLevel(), system.formatNumber(user.getExp()), user.getPrestige()
+        );
+    }
+
     private boolean isRestricted(Player player, String permissionKey) {
-        return player != null && (!player.hasPermission("CyberLevels." + permissionKey) &&
+        return player != null && (!player.hasPermission("slevels." + permissionKey) &&
                 main.cache().lang().sendMessage(player, Lang::getNoPermission));
     }
 
@@ -284,6 +308,23 @@ public class CLVCommand implements CommandExecutor {
         private final String placeholder;
 
         LevelAction(Function<Lang, List<String>> lang, String placeholder) {
+            this.lang = lang;
+            this.placeholder = placeholder;
+        }
+
+        public Function<Lang, List<String>> getMessage() {
+            return lang;
+        }
+    }
+
+    private enum PrestigeAction {
+        SET(Lang::getSetPrestige, "setPrestige");
+
+        private final Function<Lang, List<String>> lang;
+        @Getter
+        private final String placeholder;
+
+        PrestigeAction(Function<Lang, List<String>> lang, String placeholder) {
             this.lang = lang;
             this.placeholder = placeholder;
         }

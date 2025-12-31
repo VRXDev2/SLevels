@@ -1,5 +1,6 @@
 package com.bitaspire.cyberlevels.level;
 
+import com.bitaspire.cyberlevels.user.LevelUser;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +34,7 @@ public interface LevelSystem<N extends Number> {
      * Gets the maximum level for the level system.
      * @return the maximum level
      */
-    long getMaxLevel();
+    int getMaxLevel(LevelUser<?> data);
 
     /**
      * Gets the operator used for calculations in the level system.
