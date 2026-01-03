@@ -38,10 +38,9 @@ final class RivalHoesHook implements Hook, Listener {
 
         Block block = event.getCrop();
         if (antiAbuse.onlyNaturalBlocks() && block.hasMetadata("CLV_PLACED")) {
-            if (!(block.getBlockData() instanceof Ageable) || antiAbuse.includeNaturalCrops())
+            if (!(block.getBlockData() instanceof Ageable ageable) || antiAbuse.includeNaturalCrops())
                 return;
 
-            Ageable ageable = (Ageable) block.getBlockData();
             if (ageable.getAge() != ageable.getMaximumAge()) return;
         }
 
