@@ -50,7 +50,7 @@ dependencies {
 
     // Other plugin APIs
     compileOnly 'me.clip:placeholderapi:2.11.6'
-//    compileOnly files('libs/RivalHarvesterHoesAPI.jar')
+    compileOnly files('lib/RivalHarvesterHoesAPI.jar')
 //    compileOnly files('libs/RivalPickaxesAPI.jar')
 
     // Database
