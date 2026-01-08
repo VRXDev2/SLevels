@@ -161,7 +161,12 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
 
     @Override
     public int getMaxLevel(@UnknownNullability LevelUser<?> data) {
-        return (data.getPrestige() + 1) * cache.prestige().levelsPerPrestige;
+        Map.Entry<Integer, Integer> entry = cache.prestige().levelsByMinRebirth.floorEntry(data.getPrestige());
+        if (entry == null) {
+            return 1000;
+        }
+
+        return entry.getValue();
     }
 
     @NotNull

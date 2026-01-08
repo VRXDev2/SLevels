@@ -51,7 +51,7 @@ dependencies {
     // Other plugin APIs
     compileOnly 'me.clip:placeholderapi:2.11.6'
     compileOnly files('lib/RivalHarvesterHoesAPI.jar')
-//    compileOnly files('libs/RivalPickaxesAPI.jar')
+    compileOnly files('lib/RivalPickaxesAPI.jar')
 
     // Database
     compileOnly 'com.zaxxer:HikariCP:3.4.5'
