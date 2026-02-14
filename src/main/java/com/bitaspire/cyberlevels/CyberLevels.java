@@ -49,7 +49,7 @@ public final class CyberLevels extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        if (!CyberCore.restrictVersions(8, 22, "SLevels", getDescription().getVersion()))
+        if (!CyberCore.restrictVersions(8, 22, "CyberLevels", getDescription().getVersion()))
             return;
 
         instance = this;

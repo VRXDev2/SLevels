@@ -13,8 +13,8 @@ import java.util.*;
 
 public class CLVTabComplete implements TabCompleter {
 
-    private static final String PLAYER_PREFIX = "slevels.player.";
-    private static final String ADMIN_PREFIX = "slevels.admin.";
+    private static final String PLAYER_PREFIX = "clv.player.";
+    private static final String ADMIN_PREFIX = "clv.admin.";
 
     private static final Map<String, String> COMMAND_PERMISSIONS = new HashMap<>();
 

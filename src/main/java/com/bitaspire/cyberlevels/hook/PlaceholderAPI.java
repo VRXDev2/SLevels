@@ -23,7 +23,7 @@ final class PlaceholderAPI implements Hook {
 
             @Override
             public @NotNull String getIdentifier() {
-                return "slv";
+                return "clv";
             }
 
             @Override

@@ -1,5 +1,6 @@
 package com.bitaspire.cyberlevels;
 
+import com.bitaspire.cyberlevels.api.events.XPChangeEvent;
 import com.bitaspire.cyberlevels.user.UserManager;
 import com.bitaspire.libs.formula.expression.ExpressionBuilder;
 import com.bitaspire.cyberlevels.cache.Cache;
@@ -477,10 +478,14 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
                 return;
 
             if (doMultiplier && operator.compare(amount, operator.zero()) > 0 &&
-                    hasParentPerm("slevels.player.multiplier.", false))
+                    hasParentPerm("clv.player.multiplier.", false))
                 amount = operator.multiply(amount, operator.fromDouble(getMultiplier()));
 
-            final T totalAmount = amount;
+            final XPChangeEvent xpChangeEvent = new XPChangeEvent(getPlayer(), (Double) exp, (Double) operator.add(exp, amount), (Double) amount);
+            Bukkit.getPluginManager().callEvent(xpChangeEvent);
+
+
+            final T totalAmount = operator.fromDouble(xpChangeEvent.getAmount());
             long levelsChanged = 0;
 
             if (operator.compare(amount, operator.zero()) > 0) {
@@ -638,7 +643,7 @@ abstract class BaseSystem<N extends Number> implements LevelSystem<N> {
                 if (!perm.getValue()) continue;
 
                 String s = perm.getPermission().toLowerCase(Locale.ENGLISH);
-                if (!s.startsWith("slevels.player.multiplier."))
+                if (!s.startsWith("clv.player.multiplier."))
                     continue;
 
                 try {

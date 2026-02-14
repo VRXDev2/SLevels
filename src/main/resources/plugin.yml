@@ -1,4 +1,4 @@
-name: SLevels
+name: CyberLevels
 version: '${version}'
 main: com.bitaspire.cyberlevels.CyberLevels
 api-version: 1.13
@@ -12,8 +12,7 @@ folia-supported: true
 commands:
   clv:
     aliases:
-      - slevels
-      - slv
+      - clv
       - cyberlevels
       - cyberlevel
       - cyberlvl

@@ -141,14 +141,14 @@ public final class Rewards {
         }
 
         private boolean isAllowed(Player player, String type) {
-            if (!player.hasPermission("slevels.suppress.levelup." + type))
+            if (!player.hasPermission("clv.suppress.levelup." + type))
                 return true;
 
             for (PermissionAttachmentInfo perm : player.getEffectivePermissions()) {
                 String p = perm.getPermission().toLowerCase();
-                if (perm.getValue() && (p.equals("slevels.suppress.levelup." + type)
-                        || p.equals("slevels.suppress.levelup.*")
-                        || p.equals("slevels.suppress.*"))) return false;
+                if (perm.getValue() && (p.equals("clv.suppress.levelup." + type)
+                        || p.equals("clv.suppress.levelup.*")
+                        || p.equals("clv.suppress.*"))) return false;
             }
             return true;
         }

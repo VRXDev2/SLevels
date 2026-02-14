@@ -142,10 +142,10 @@ public class CLVCommand implements CommandExecutor {
         }
 
         if (player != null) {
-            if (player.hasPermission("slevels.admin.help"))
+            if (player.hasPermission("clv.admin.help"))
                 return main.cache().lang().sendMessage(player, Lang::getHelpAdmin);
 
-            if (player.hasPermission("slevels.player.help"))
+            if (player.hasPermission("clv.player.help"))
                 return main.cache().lang().sendMessage(player, Lang::getHelpPlayer);
         }
 
@@ -257,7 +257,7 @@ public class CLVCommand implements CommandExecutor {
     }
 
     private boolean isRestricted(Player player, String permissionKey) {
-        return player != null && (!player.hasPermission("slevels." + permissionKey) &&
+        return player != null && (!player.hasPermission("clv." + permissionKey) &&
                 main.cache().lang().sendMessage(player, Lang::getNoPermission));
     }
 
